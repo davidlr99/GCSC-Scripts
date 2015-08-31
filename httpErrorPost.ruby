@@ -9,9 +9,10 @@ headerValues = {}
 
 puts "To which addres (IP or URL) do you want to post this ?"
 urltyped = gets.chomp;
+
 url = URI.parse(urltyped)
 http = Net::HTTP.new(url.host, url.port)
-
+http.use_ssl = true #Turn OFF if you want :D
 
 puts "How many header fields ?"
 headersCount = gets.chomp
@@ -27,7 +28,7 @@ while i < headersCount.to_i
 end
 
 puts "What post-variables do you want to post? Replace the varaiable content with ?  (e.g user=?&pass=?&time=?)."
-data = gets;
+data = gets.chomp;
 
 contents = File.read('errorlist.txt')
 lines = contents.split("\n")
@@ -40,12 +41,22 @@ lines.each do |line|
   for headername in headers
     headerValues.store(headername, line)
   end
+
+#  headerValues.store("Content-Type", "application/x-www-form-urlencoded")
+
+
+
+
+
+
   postdata = data.gsub("?", line)
   resp = http.post(url.path, postdata, headerValues)
   puts "\n\n\n"
   puts resp
 
   responseheaders = resp.to_hash
+  puts "\nPosted: #{postdata}";
   puts "\nHeaders:\n#{responseheaders}";
   puts "\nBody:\n#{resp.body}"
+  sleep 0.5
 end
